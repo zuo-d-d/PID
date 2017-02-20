@@ -8,6 +8,7 @@ struct _pid{
   float err_last;
   float err_next;
   float Kp,Ki,Kd;
+  float umax,umin;
 }pid;
 
 void PID_init() {
@@ -18,8 +19,10 @@ void PID_init() {
   pid.err_last=0.0;
   pid.err_next=0.0;
   pid.Kp=0.2;
-  pid.Ki=0.04;
+  pid.Ki=0.1;
   pid.Kd=0.2;
+  pid.umax=400;
+  pid.umin=-200;
   printf("PID_init end \n");
 }
 
@@ -27,13 +30,35 @@ float PID_realize(float speed){
   pid.SetSpeed=speed;
   pid.err=pid.SetSpeed-pid.ActualSpeed;
   int index;
-  if (abs(pid.err)>200) {
-    index=0;
+
+  if (pid.ActualSpeed>pid.umax) {
+    if (abs(pid.err)>200 ) {
+      index=0;
+    }
+    else {
+      index=1;
+    }
   }
-  else {
-    index=1;
+  else if (pid.ActualSpeed<pid.umin) {
+    if (abs(pid.err)>200 ) {
+      index=0;
+    }
+    else {
+      index=1;
+    }
   }
+  else{
+    if (abs(pid.err)>200 ) {
+      index=0;
+    }
+    else {
+      index=1;
+    }
+  }
+
   float incrementSpeed=pid.Kp*(pid.err-pid.err_next)+index*pid.Ki*pid.err+pid.Kd*(pid.err-2*pid.err_next+pid.err_last);
+
+
   pid.ActualSpeed+=incrementSpeed;
   pid.err_last=pid.err_next;
   pid.err_next=pid.err;
