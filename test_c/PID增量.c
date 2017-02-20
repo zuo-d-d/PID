@@ -18,8 +18,8 @@ void PID_init() {
   pid.err=0.0;
   pid.err_last=0.0;
   pid.err_next=0.0;
-  pid.Kp=0.2;
-  pid.Ki=0.1;
+  pid.Kp=0.4;
+  pid.Ki=0.2;
   pid.Kd=0.2;
   pid.umax=400;
   pid.umin=-200;
@@ -29,31 +29,15 @@ void PID_init() {
 float PID_realize(float speed){
   pid.SetSpeed=speed;
   pid.err=pid.SetSpeed-pid.ActualSpeed;
-  int index;
-
-  if (pid.ActualSpeed>pid.umax) {
-    if (abs(pid.err)>200 ) {
-      index=0;
-    }
-    else {
-      index=1;
-    }
+  float index;
+  if (abs(pid.err)>200) {
+    index=0;
   }
-  else if (pid.ActualSpeed<pid.umin) {
-    if (abs(pid.err)>200 ) {
-      index=0;
-    }
-    else {
-      index=1;
-    }
+  else if (abs(pid.err)<180){
+    index=1;
   }
-  else{
-    if (abs(pid.err)>200 ) {
-      index=0;
-    }
-    else {
-      index=1;
-    }
+  else {
+    index=(200-abs(pid.err))/20;
   }
 
   float incrementSpeed=pid.Kp*(pid.err-pid.err_next)+index*pid.Ki*pid.err+pid.Kd*(pid.err-2*pid.err_next+pid.err_last);
