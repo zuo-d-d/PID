@@ -19,8 +19,8 @@ void PID_init() {
   pid.err_last=0.0;
   pid.voltage=0.0;
   pid.integral=0.0;
-  pid.Kp=0.2;
-  pid.Ki=0.1;
+  pid.Kp=0.4;
+  pid.Ki=0.2;
   pid.Kd=0.2;
   pid.umax=400;
   pid.umin=-200;
@@ -30,39 +30,18 @@ void PID_init() {
 float PID_realize(float speed){
   pid.SetSpeed=speed;
   pid.err=pid.SetSpeed-pid.ActualSpeed;
-  int index;
-  if (pid.ActualSpeed>pid.umax) //抗积分饱和
-  {
+  float index;
     if (abs(pid.err)>200) {
       index=0;
     }
-    else {
-      index=1;
-      if(pid.err<0){
-        pid.integral+=pid.err;
-      }
-    }
-  }
-  else if (pid.ActualSpeed<pid.umin) {
-    if (abs(pid.err)>200) {
-      index=0;
-    }
-    else {
-      index=1;
-      if(pid.err>0){
-        pid.integral+=pid.err;
-      }
-    }
-  }
-  else{
-    if (abs(pid.err)>200) {
-      index=0;
-    }
-    else {
-      index=1;
+    else if (abs(pid.err)<180){
+      index=1.0;
       pid.integral+=pid.err;
     }
-  }
+    else {
+      index=(200-abs(pid.err))/20.0;
+      pid.integral+=pid.err;
+    }
   pid.voltage=pid.Kp*pid.err+index*pid.Ki*pid.integral+pid.Kd*(pid.err-pid.err_last);
   pid.err_last=pid.err;
   pid.ActualSpeed=pid.voltage*1.0;
