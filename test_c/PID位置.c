@@ -19,7 +19,7 @@ void PID_init() {
   pid.voltage=0.0;
   pid.integral=0.0;
   pid.Kp=0.2;
-  pid.Ki=0.015;
+  pid.Ki=0.04;
   pid.Kd=0.2;
   printf("PID_init end \n");
 }
@@ -27,8 +27,15 @@ void PID_init() {
 float PID_realize(float speed){
   pid.SetSpeed=speed;
   pid.err=pid.SetSpeed-pid.ActualSpeed;
-  pid.integral+=pid.err;
-  pid.voltage=pid.Kp*pid.err+pid.Ki*pid.integral+pid.Kd*(pid.err-pid.err_last);
+  int index;
+  if (abs(pid.err)>200) {
+    index=0;
+  }
+  else {
+    index=1;
+    pid.integral+=pid.err;
+  }
+  pid.voltage=pid.Kp*pid.err+index*pid.Ki*pid.integral+pid.Kd*(pid.err-pid.err_last);
   pid.err_last=pid.err;
   pid.ActualSpeed=pid.voltage*1.0;
   return pid.ActualSpeed;

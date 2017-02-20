@@ -18,7 +18,7 @@ void PID_init() {
   pid.err_last=0.0;
   pid.err_next=0.0;
   pid.Kp=0.2;
-  pid.Ki=0.04;
+  pid.Ki=0.015;
   pid.Kd=0.2;
   printf("PID_init end \n");
 }
